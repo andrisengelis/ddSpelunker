@@ -1,0 +1,27 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: docker login
+      env:
+        DOCKER_USER: ${{secrets.DOCKERUSERNAME}}
+        DOCKER_PASSWORD: ${{secrets.DOCKERPASSWORD}}
+      run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+      
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag ${{secrets.DOCKERUSERNAME}}/ddspelunker:$(date +%s)
+    
+    - name: Push Docker image
+      run: docker push ${{secrets.DOCKERUSERNAME}}/ddspelunker
